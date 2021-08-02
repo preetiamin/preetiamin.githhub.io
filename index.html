@@ -1,0 +1,179 @@
+<DOCTYPE html>
+<html>
+
+<script src='https://d3js.org/d3.v5.min.js'></script>
+<script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+
+<style>
+a {
+    text-decoration: none;
+    display: inline-block;
+    padding: 8px 16px;
+}
+
+a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.previous {
+    background-color: #f1f1f1;
+    color: black;
+}
+
+.next {
+    background-color: #1e90ff;
+    color: white;
+}
+
+.round {
+    border-radius: 50%;
+}
+
+div.tooltip {	
+    position: absolute;			
+    text-align: center;								
+    padding: 6px;				
+    font: 12px sans-serif;		
+    background: lightsteelblue;	
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;			
+}
+</style>
+
+<head>
+<title>Vehicle Fuel Economy</title>
+</head>
+
+<body onload='init()'>
+<h1 style="color:blue;">Vehicle Fuel Economy</h1>
+<a href="graph2.html" class="next">Next</a>
+
+<p>Fuel Economy is a key factor in consumer decision-making  when purchasing a vehicle. Vehicles with greater fuel efficiency cost less to operate saving more money at the pump. In addition, the reduction in greenhouse gas emissions resulting from higher fuel efficiency is better for the planet and better for the health of the driver. Here is a comparison of the fuel efficiency of about 150 vehicles from 2017 automobile manufacturers.</p>
+
+<svg width=600 height=600>
+</svg>
+<script>
+
+margin = 100
+height = 400
+width = 400
+
+annotations = [
+  {
+    note: {
+      label: "Gasoline vehicles dominate the vehicles market"
+    },
+    x: 190,
+    y: 375,
+    dy: 25,
+    dx: 25
+  },
+  { 
+    note: {
+      label: "Electric vehicles are the most fuel efficient"  
+    }, 
+    x: 435,
+    y: 170,
+    dy: 25,
+    dx: 25
+  },
+  { 
+    note: {
+      label: "Similar sized diesel vehicles are generally more fuel efficient than gasoline vehicles"
+    },
+    x: 250,
+    y: 295,
+    dy: -25,
+    dx: -25
+  }
+]
+
+makeAnnotations = d3.annotation()
+  .annotations(annotations)
+d3.select("svg")
+  .append("g")
+  .call(makeAnnotations)
+
+x = d3.scaleLog().domain([10,200]).range([0,400]);
+y = d3.scaleLog().domain([10,150]).range([400,0]);
+color = d3.scaleOrdinal(d3.schemeCategory10);
+
+div = d3.select("body").append("div")
+  .attr("class", "tooltip")
+  .style("opacity",0);
+
+async function init() {
+  data = await d3.csv("https://flunky.github.io/cars2017.csv");
+  select('All');
+}
+
+function select(category) {
+    d3.select("svg").selectAll("circle").remove()
+    d3.select("svg")
+    .append("g")
+    .attr("transform","translate("+margin+","+margin+")")
+    .selectAll("circle")
+    .data(data)
+    .enter()
+    .append("circle")
+    .filter(function(d) {if (category=='All') {return d} else {return d.Fuel==category};})
+      .attr("cx", function(d) {return x(d.AverageCityMPG);})
+      .attr("cy", function(d) {return y(d.AverageHighwayMPG);})
+      .attr("r", 4)
+      .style("fill", function(d) {return color(d.Fuel);})
+      .style("opacity", 0.5)
+      .on("mouseover", function(d) {
+        div.transition()
+          .duration(200)
+          .style("opacity", 0.9);
+        div .html("Fuel Type: "+d.Fuel+"<br/>"+"Manufacturer: "+d.Make+"<br/>"+
+                  "Ave Highway Mileage: "+d.AverageHighwayMPG+" mpg<br/>"+
+                  "Ave City Mileage: "+d.AverageCityMPG+" mpg")
+            .style("left", (d3.event.pageX)+"px")
+            .style("top", (d3.event.pageY -28)+"px");
+        })
+        .on("mouseout",function(d) {
+          div.transition()
+            .duration(500)
+            .style("opacity", 0);
+      });
+
+  d3.select("svg").append("g")
+    .attr("transform","translate("+margin+","+margin+")")
+    .call(d3.axisLeft(y).tickValues([10,20,50,100,150]).tickFormat(d3.format("d")))
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("font-size","16px")
+      .attr("y", 0 - (margin/2))
+      .attr("x", 0 - (height/2))
+      .attr("dy", "0.7em")
+      .style("text-anchor", "middle")
+      .attr("fill", "#5D6971")
+      .text("Average Highway Mileage (mpg)");
+
+  d3.select("svg").append("g")
+    .attr("transform","translate("+margin+","+(height+margin)+")")
+    .call(d3.axisBottom(x).tickValues([10,20,50,100,150]).tickFormat(d3.format("d")));
+
+  d3.select("svg")
+    .append("text")             
+      .attr("transform","translate("+(0.75*width)+","+(height+margin+40)+")")
+      .attr("font-size","16px")
+      .style("text-anchor", "middle")
+      .attr("fill", "#5D6971")
+      .text("Average City Mileage(mpg)");
+}
+
+</script>
+
+<div class="control-group">
+  <button id="button1" onclick="select('Diesel')">Diesel</button>
+  <button id="button2" onclick="select('Gasoline')">Gasoline</button>
+  <button id="button3" onclick="select('Electricity')">Electric</button>
+  <button onclick="select('All')">All</button>
+</div>
+
+</body>
+</html>
