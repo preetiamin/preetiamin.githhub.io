@@ -1,0 +1,160 @@
+<DOCTYPE html>
+<html>
+<script src='https://d3js.org/d3.v5.min.js'></script>
+<script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+
+<style>
+
+a {
+    text-decoration: none;
+    display: inline-block;
+    padding: 8px 16px;
+}
+
+a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.previous {
+    background-color: #f1f1f1;
+    color: black;
+}
+
+.next {
+    background-color: #1e90ff;
+    color: white;
+}
+
+.round {
+    border-radius: 50%;
+}
+
+div.tooltip {	
+    position: absolute;			
+    text-align: center;								
+    padding: 6px;				
+    font: 12px sans-serif;		
+    background: lightsteelblue;	
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;			
+}
+</style>
+
+<head>
+<title>Vehicle Fuel Economy</title>
+</head>
+
+<body onload='init()'>
+<h1  style="color:blue;">Vehicle Fuel Economy</h1>
+<a href="graph2.html" class="previous">Prev</a>
+
+<p>The data explored here is from automobile manufacturers in 2017. In the dataset, only a small percentage of vehicles listed are diesel and electric (4% diesel and 7% electric), majority are gasoline powered. Let's explore which type of gasoline vehicles are most popular assuming this dataset represents the population of vehicles; we can see that 4-cylinder vehicles are the top vehicles. In fact, fuel efficiency has become an important factor in owning a vehicle in today's world. With the electric vehicle market continuing to grow, it is to be seen when the electric cars take over the gasoline powered vehicles.</p>
+
+<svg width=600 height=600>
+</svg>
+<script>
+
+margin = 100
+height = 400
+width = 400
+
+annotations = [
+  {
+    note: {
+      label: "4-cyclinder vehicles are the most popular"
+    },
+    x: 225,
+    y: 180,
+    dy: -25,
+    dx: 25
+  }
+]
+
+makeAnnotations = d3.annotation()
+  .annotations(annotations)
+d3.select("svg")
+  .append("g")
+  .call(makeAnnotations)
+
+div = d3.select("body").append("div")
+  .attr("class", "tooltip")
+  .style("opacity",0);
+
+async function init() {
+  data = await d3.csv("https://flunky.github.io/cars2017.csv");
+  data = data.filter(function(d) {return d.Fuel=="Gasoline";});
+  //console.log(data)
+  var vehiclesByCylinder = d3.nest()
+  .key(function(d) { return d.EngineCylinders; })
+  .entries(data);
+  
+  var cylinderCount = d3.nest()
+    .key(function(d) {return d.EngineCylinders;})
+    .rollup(function(v) {return v.length;})
+    .entries(data)
+    .sort(function(a,b) {return a.key-b.key;});
+  
+  //console.log(JSON.stringify(cylinderCount));
+
+  x = d3.scaleBand().domain([2,3,4,6,8,10,12])
+    .rangeRound([0,400]).padding(0.1);
+  y = d3.scaleLinear().domain([0, 60]).range([400,0]);
+  
+  d3.select("svg")
+    .append("g")
+    .attr("transform","translate("+margin+","+margin+")")
+    .selectAll("rect")
+    .data(cylinderCount)
+    .enter()
+    .append("rect")
+      .attr("x", function(d,i) {return i*width/7;})
+      .attr("y", function(d) {return y(d.value);})
+      .attr("width",42)
+      .attr("height",function(d) {return height-y(d.value);})
+      .attr("fill", "dodgerblue")
+      .attr("stroke","blue")
+      .on("mouseover", function(d) {
+        div.transition()
+          .duration(200)
+          .style("opacity", 0.9);
+        div .html("Number of Cylinders: "+d.key+"<br/>"+"Number of Vehicles: "+d.value)
+            .style("left", (d3.event.pageX)+"px")
+            .style("top", (d3.event.pageY -28)+"px");
+        })
+        .on("mouseout",function(d) {
+          div.transition()
+            .duration(500)
+            .style("opacity", 0);
+      });
+
+  d3.select("svg").append("g")
+    .attr("transform","translate("+margin+","+margin+")")
+    .call(d3.axisLeft(y))
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("font-size","16px")
+      .attr("y", 0 - (margin/2))
+      .attr("x", 0 - (height/2))
+      .attr("dy", "0.7em")
+      .style("text-anchor", "middle")
+      .attr("fill", "#5D6971")
+      .text("Number of vehicles");
+
+  d3.select("svg").append("g")
+    .attr("transform","translate("+margin+","+(height+margin)+")")
+    .call(d3.axisBottom(x));
+
+  d3.select("svg")
+    .append("text")             
+      .attr("transform","translate("+(0.75*width)+","+(height+margin+40)+")")
+      .attr("font-size","16px")
+      .style("text-anchor", "middle")
+      .attr("fill", "#5D6971")
+      .text("Number of cylinders");
+}
+</script>
+
+</body>
+</html>
