@@ -40,7 +40,7 @@ div.tooltip {
     background: lightsteelblue;	
     border: 0px;		
     border-radius: 8px;			
-i    pointer-events: none;			
+    pointer-events: none;			
 }
 </style>
 <head>
@@ -124,7 +124,7 @@ function select(category) {
           .style("opacity", 0.9);
         div .html("Fuel Type: "+d.Fuel+"<br/>"+"Manufacturer: "+d.Make+"<br/>"+
                   "Ave Highway Mileage: "+d.AverageHighwayMPG+" mpg<br/>"+
-                  "Ave City Mileage: "+d.AverageCityMPG+" mpg")
+                  "Number of Cylinders: "+d.EngineCylinders)
             .style("left", (d3.event.pageX)+"px")
             .style("top", (d3.event.pageY -28)+"px");
         })
