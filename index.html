@@ -52,6 +52,14 @@ div.tooltip {
 
 <p>Fuel Economy is a key factor in consumer decision-making  when purchasing a vehicle. Vehicles with greater fuel efficiency cost less to operate saving more money at the pump. In addition, the reduction in greenhouse gas emissions resulting from higher fuel efficiency is better for the planet and better for the health of the driver. Here is a comparison of the fuel efficiency of about 150 vehicles from 2017 automobile manufacturers.</p>
 
+<br>
+<div class="control-group">
+  <button background-color="C6EF9F" onclick="select('Diesel')">Diesel</button>
+  <button id="button2" onclick="select('Gasoline')">Gasoline</button>
+  <button id="button3" onclick="select('Electricity')">Electric</button>
+  <button onclick="select('All')">All</button>
+</div>
+
 <svg width=600 height=600>
 </svg>
 <script>
@@ -128,8 +136,8 @@ function select(category) {
         div.transition()
           .duration(200)
           .style("opacity", 0.9);
-        div .html("Fuel Type: "+d.Fuel+"<br/>"+"Manufacturer: "+d.Make+"<br/>"+
-                  "Ave Highway Mileage: "+d.AverageHighwayMPG+" mpg<br/>"+
+        div .html("Fuel Type: "+d.Fuel+"<br>"+"Manufacturer: "+d.Make+"<br>"+
+                  "Ave Highway Mileage: "+d.AverageHighwayMPG+" mpg<br>"+
                   "Ave City Mileage: "+d.AverageCityMPG+" mpg")
             .style("left", (d3.event.pageX)+"px")
             .style("top", (d3.event.pageY -28)+"px");
@@ -155,7 +163,7 @@ function select(category) {
 
   d3.select("svg").append("g")
     .attr("transform","translate("+margin+","+(height+margin)+")")
-    .call(d3.axisBottom(x).tickValues([10,20,50,100,150]).tickFormat(d3.format("d")));
+    .call(d3.axisBottom(x).tickValues([10,20,50,100,200]).tickFormat(d3.format("d")));
 
   d3.select("svg")
     .append("text")             
@@ -163,17 +171,11 @@ function select(category) {
       .attr("font-size","16px")
       .style("text-anchor", "middle")
       .attr("fill", "#5D6971")
-      .text("Average City Mileage(mpg)");
+      .text("Average City Mileage (mpg)");
 }
 
 </script>
 
-<div class="control-group">
-  <button id="button1" onclick="select('Diesel')">Diesel</button>
-  <button id="button2" onclick="select('Gasoline')">Gasoline</button>
-  <button id="button3" onclick="select('Electricity')">Electric</button>
-  <button onclick="select('All')">All</button>
-</div>
 
 </body>
 </html>

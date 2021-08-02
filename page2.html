@@ -40,7 +40,7 @@ div.tooltip {
     background: lightsteelblue;	
     border: 0px;		
     border-radius: 8px;			
-    pointer-events: none;			
+i    pointer-events: none;			
 }
 </style>
 <head>
@@ -52,7 +52,16 @@ div.tooltip {
 <a href="index.html" class="previous">Prev</a>
 <a href="page3.html" class="next">Next</a>
 
-<p>Electric cars far surpass gasoline and diesel powered cars in fuel efficiency. For gasoline and diesel powered cars, a 4-cyclinder engine is generally more fuel efficient than a 6-cylinder engine. As the number of cylinders increases, fuel efficiency continues to drop. Diesel powered cars are generally more fuel efficient than similar sized gasoline cars.</p>
+<p>Electric cars far surpass gasoline and diesel powered cars in fuel efficiency. For gasoline and diesel powered cars, a 4-cyclinder engine is generally more fuel efficient than a 6-cylinder engine. As the number of cylinders increases, fuel efficiency continues to drop. Diesel powered cars are generally more fuel efficient than similar sized gasoline cars. Note: Electric vehicles displayed as having 0 cylinders.</p>
+
+<br>
+<div class="control-group">
+  <button onclick="select('Diesel')">Diesel</button>
+  <button onclick="select('Gasoline')">Gasoline</button>
+  <button onclick="select('Electricity')">Electric</button>
+  <button onclick="select('All')">All</button>
+</div>
+
 
 <svg width=600 height=600>
 </svg>
@@ -148,16 +157,10 @@ d3.select("svg")
     .attr("font-size","16px")
     .style("text-anchor", "middle")
     .attr("fill", "#5D6971")
-    .text("Average City Mileage (mpg)");
+    .text("Number of cylinders");
 }
 </script>
 
-<div class="control-group">
-  <button onclick="select('Diesel')">Diesel</button>
-  <button onclick="select('Gasoline')">Gasoline</button>
-  <button onclick="select('Electricity')">Electricity</button>
-  <button onclick="select('All')">All</button>
-</div>
 
 </body>
 </html>
