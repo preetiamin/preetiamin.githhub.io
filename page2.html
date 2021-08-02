@@ -1,10 +1,10 @@
 <DOCTYPE html>
 <html>
-
 <script src='https://d3js.org/d3.v5.min.js'></script>
 <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
 
 <style>
+
 a {
     text-decoration: none;
     display: inline-block;
@@ -32,8 +32,10 @@ a:hover {
 
 div.tooltip {	
     position: absolute;			
-    text-align: center;								
-    padding: 6px;				
+    text-align: center;			
+    width: 200px;					
+    height: 60px;					
+    padding: 2px;				
     font: 12px sans-serif;		
     background: lightsteelblue;	
     border: 0px;		
@@ -41,16 +43,16 @@ div.tooltip {
     pointer-events: none;			
 }
 </style>
-
 <head>
 <title>Vehicle Fuel Economy</title>
 </head>
 
 <body onload='init()'>
 <h1 style="color:blue;">Vehicle Fuel Economy</h1>
-<a href="page2.html" class="next">Next</a>
+<a href="index.html" class="previous">Prev</a>
+<a href="page3.html" class="next">Next</a>
 
-<p>Fuel Economy is a key factor in consumer decision-making  when purchasing a vehicle. Vehicles with greater fuel efficiency cost less to operate saving more money at the pump. In addition, the reduction in greenhouse gas emissions resulting from higher fuel efficiency is better for the planet and better for the health of the driver. Here is a comparison of the fuel efficiency of about 150 vehicles from 2017 automobile manufacturers.</p>
+<p>Electric cars far surpass gasoline and diesel powered cars in fuel efficiency. For gasoline and diesel powered cars, a 4-cyclinder engine is generally more fuel efficient than a 6-cylinder engine. As the number of cylinders increases, fuel efficiency continues to drop. Diesel powered cars are generally more fuel efficient than similar sized gasoline cars.</p>
 
 <svg width=600 height=600>
 </svg>
@@ -63,30 +65,12 @@ width = 400
 annotations = [
   {
     note: {
-      label: "Gasoline vehicles dominate the vehicles market"
+      label: "As number of cylinders and power increase, fuel efficiency generally decreases"
     },
-    x: 190,
-    y: 375,
-    dy: 25,
-    dx: 25
-  },
-  { 
-    note: {
-      label: "Electric vehicles are the most fuel efficient"  
-    }, 
-    x: 435,
-    y: 170,
-    dy: 25,
-    dx: 25
-  },
-  { 
-    note: {
-      label: "Similar sized diesel vehicles are generally more fuel efficient than gasoline vehicles"
-    },
-    x: 250,
-    y: 295,
-    dy: -25,
-    dx: -25
+    x: 300,
+    y: 300,
+    dy: -100,
+    dx: 100
   }
 ]
 
@@ -96,7 +80,7 @@ d3.select("svg")
   .append("g")
   .call(makeAnnotations)
 
-x = d3.scaleLog().domain([10,200]).range([0,400]);
+x = d3.scaleLinear().domain([0,12]).range([0,400]);
 y = d3.scaleLog().domain([10,150]).range([400,0]);
 color = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -107,6 +91,7 @@ div = d3.select("body").append("div")
 async function init() {
   data = await d3.csv("https://flunky.github.io/cars2017.csv");
   select('All');
+
 }
 
 function select(category) {
@@ -119,7 +104,7 @@ function select(category) {
     .enter()
     .append("circle")
     .filter(function(d) {if (category=='All') {return d} else {return d.Fuel==category};})
-      .attr("cx", function(d) {return x(d.AverageCityMPG);})
+      .attr("cx", function(d) {return x(d.EngineCylinders);})
       .attr("cy", function(d) {return y(d.AverageHighwayMPG);})
       .attr("r", 4)
       .style("fill", function(d) {return color(d.Fuel);})
@@ -140,38 +125,37 @@ function select(category) {
             .style("opacity", 0);
       });
 
-  d3.select("svg").append("g")
-    .attr("transform","translate("+margin+","+margin+")")
-    .call(d3.axisLeft(y).tickValues([10,20,50,100,150]).tickFormat(d3.format("d")))
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("font-size","16px")
-      .attr("y", 0 - (margin/2))
-      .attr("x", 0 - (height/2))
-      .attr("dy", "0.7em")
-      .style("text-anchor", "middle")
-      .attr("fill", "#5D6971")
-      .text("Average Highway Mileage (mpg)");
+d3.select("svg").append("g")
+  .attr("transform","translate("+margin+","+margin+")")
+  .call(d3.axisLeft(y).tickValues([10,20,50,100,150]).tickFormat(d3.format("d")))
+  .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("font-size","16px")
+    .attr("y", 0 - (margin/2))
+    .attr("x", 0 - (height/2))
+    .attr("dy", "0.7em")
+    .style("text-anchor", "middle")
+    .attr("fill", "#5D6971")
+    .text("Average Highway Mileage (mpg)");
 
-  d3.select("svg").append("g")
-    .attr("transform","translate("+margin+","+(height+margin)+")")
-    .call(d3.axisBottom(x).tickValues([10,20,50,100,150]).tickFormat(d3.format("d")));
+d3.select("svg").append("g")
+  .attr("transform","translate("+margin+","+(height+margin)+")")
+  .call(d3.axisBottom(x).tickValues([2,4,6,8,10,12]).tickFormat(d3.format("d")));
 
-  d3.select("svg")
-    .append("text")             
-      .attr("transform","translate("+(0.75*width)+","+(height+margin+40)+")")
-      .attr("font-size","16px")
-      .style("text-anchor", "middle")
-      .attr("fill", "#5D6971")
-      .text("Average City Mileage(mpg)");
+d3.select("svg")
+  .append("text")             
+    .attr("transform","translate("+(0.75*width)+","+(height+margin+40)+")")
+    .attr("font-size","16px")
+    .style("text-anchor", "middle")
+    .attr("fill", "#5D6971")
+    .text("Average City Mileage (mpg)");
 }
-
 </script>
 
 <div class="control-group">
-  <button id="button1" onclick="select('Diesel')">Diesel</button>
-  <button id="button2" onclick="select('Gasoline')">Gasoline</button>
-  <button id="button3" onclick="select('Electricity')">Electric</button>
+  <button onclick="select('Diesel')">Diesel</button>
+  <button onclick="select('Gasoline')">Gasoline</button>
+  <button onclick="select('Electricity')">Electricity</button>
   <button onclick="select('All')">All</button>
 </div>
 
