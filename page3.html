@@ -74,9 +74,13 @@ annotations = [
 
 makeAnnotations = d3.annotation()
   .annotations(annotations)
-d3.select("svg")
-  .append("g")
-  .call(makeAnnotations)
+
+ d3.select("svg")
+    .append("g")
+//    .transition()
+//    .delay(14000)
+//    .duration(2000)
+    .call(makeAnnotations)
 
 div = d3.select("body").append("div")
   .attr("class", "tooltip")
@@ -110,11 +114,18 @@ async function init() {
     .enter()
     .append("rect")
       .attr("x", function(d,i) {return i*width/7;})
-      .attr("y", function(d) {return y(d.value);})
       .attr("width",42)
+      .attr("y", function(d) {return y(0);})
+      .attr("height",0)
+      .transition()
+      .duration(2000)
+      .attr("y", function(d) {return y(d.value);})
       .attr("height",function(d) {return height-y(d.value);})
       .attr("fill", "dodgerblue")
-      .attr("stroke","blue")
+      .attr("stroke","blue");
+
+
+   d3.select("svg").selectAll("rect")
       .on("mouseover", function(d) {
         div.transition()
           .duration(200)
@@ -129,6 +140,7 @@ async function init() {
             .style("opacity", 0);
       });
 
+  
   d3.select("svg").append("g")
     .attr("transform","translate("+margin+","+margin+")")
     .call(d3.axisLeft(y))
